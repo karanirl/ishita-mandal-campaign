@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ishita Mandal for President</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for a quirky, modern feel -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/dist/phosphor.js"></script>
+    <!-- Confetti library for a fun effect -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <style>
+        /* CSS Reset for consistent styling */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            /* Default Pastel Color Palette (Day/Light Theme) */
+            --bg-color: #f7f3e9; /* Off-white / light cream */
+            --text-color: #2c3e50; /* Dark slate blue */
+            --accent-color: #8e7bff; /* Soft purple */
+            --secondary-accent: #ffb7c5; /* Muted pink */
+            --card-bg: #e0eafc; /* Light blue-gray */
+            --card-text: #2c3e50;
+            --button-bg: #ffb7c5;
+            --button-text: #2c3e50;
+            --transition-speed: 0.8s;
+        }
+
+        /* Sunset Theme */
+        .sunset-theme {
+            --bg-color: #ffe0b2; /* Soft orange */
+            --text-color: #5d4037; /* Brown */
+            --accent-color: #ff7043; /* Bright orange */
+            --secondary-accent: #ffcc80; /* Light orange */
+            --card-bg: #fff3e0; /* Pale yellow */
+            --card-text: #5d4037;
+            --button-bg: #ff7043;
+            --button-text: #fff3e0;
+        }
+
+        /* Ocean Theme */
+        .ocean-theme {
+            --bg-color: #e0f7fa; /* Pale cyan */
+            --text-color: #006064; /* Dark teal */
+            --accent-color: #00bcd4; /* Bright cyan */
+            --secondary-accent: #80deea; /* Light blue */
+            --card-bg: #b2ebf2; /* Light blue-green */
+            --card-text: #006064;
+            --button-bg: #00bcd4;
+            --button-text: #e0f7fa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Reusable styles for sections */
+        section {
+            padding: 80px 0;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1), transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .section-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1, h2 {
+            font-weight: 800;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            margin-bottom: 40px;
+        }
+
+        p {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 40px;
+        }
+        
+        /* Cursor Follower */
+        .cursor-follower {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease-out, opacity 0.5s;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: var(--bg-color);
+            backdrop-filter: blur(10px);
+            transition: background-color var(--transition-speed);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-link a {
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+        
+        .nav-link a:hover {
+            color: var(--accent-color);
+        }
+
+        /* New: Theme tabs container */
+        .theme-tabs {
+            display: flex;
+            gap: 10px;
+            margin-left: auto; /* Push theme tabs to the right */
+        }
+
+        .theme-tab {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .theme-tab.active, .theme-tab:hover {
+            border-color: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        .theme-tab[data-theme="default"] { background-color: #e0eafc; }
+        .theme-tab[data-theme="sunset"] { background-color: #ff7043; }
+        .theme-tab[data-theme="ocean"] { background-color: #00bcd4; }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: color var(--transition-speed);
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        
+        /* New: Background canvas for particles */
+        #hero-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 10vw, 7rem);
+            animation: fadeIn 1.5s ease-in-out;
+            animation-delay: 0.5s;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+
+        .hero p {
+            font-weight: 600;
+            opacity: 0;
+            animation: fadeIn 1.5s 1s forwards ease-in-out;
+            max-width: 900px;
+        }
+
+        .cta-button {
+            padding: 15px 30px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            font-weight: 800;
+            text-decoration: none;
+            border-radius: 999px;
+            transition: transform 0.3s, box-shadow 0.3s, background-color var(--transition-speed), color var(--transition-speed);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1.5s 1.5s forwards ease-in-out;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Manifesto Section */
+        .manifesto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        /* New: Slide up animation for cards */
+        .manifesto-card {
+            background-color: var(--card-bg);
+            color: var(--card-text);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s, background-color var(--transition-speed), color var(--transition-speed);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .manifesto-card.card-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .manifesto-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .manifesto-card .icon {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            display: block;
+            transition: color var(--transition-speed);
+        }
+
+        .manifesto-card h3 {
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        /* New: PORS section */
+        .pors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .por-card {
+            background-color: var(--card-bg);
+            color: var(--card-text);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, background-color var(--transition-speed), color var(--transition-speed);
+        }
+        
+        .por-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .por-card ul {
+            list-style-type: none;
+        }
+        
+        .por-card li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .por-card li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        /* Candidate Section */
+        .candidate-bio {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .candidate-photo {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--accent-color);
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: border-color var(--transition-speed);
+        }
+        
+        /* Voting Info Section */
+        .voting-info {
+            background-color: var(--secondary-accent);
+            color: var(--text-color);
+            border-radius: 20px;
+            padding: 60px;
+            text-align: center;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        .voting-info h2 {
+            color: var(--text-color);
+            transition: color var(--transition-speed);
+        }
+        
+        /* New: Game section */
+        #game-section {
+            padding-top: 20px;
+        }
+        
+        #game-section h2 {
+            margin-bottom: 20px;
+        }
+
+        #game-canvas {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: crosshair;
+            display: block;
+            margin: 0 auto;
+            max-width: 90vw; /* Responsive canvas max width */
+            max-height: 60vh; /* Responsive canvas max height */
+        }
+
+        .game-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .game-controls button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 999px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, background-color var(--transition-speed), color var(--transition-speed);
+            margin-bottom: 10px;
+        }
+        
+        .game-controls button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .score-timer-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .score, .timer {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        #gameOverMessage {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .footer p {
+            margin: 0;
+        }
+
+        /* Keyframe animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            .nav {
+                flex-direction: column;
+                gap: 20px;
+                padding-bottom: 10px;
+            }
+            
+            .nav-links {
+                justify-content: center;
+                gap: 1rem;
+            }
+            
+            .theme-tabs {
+                justify-content: center;
+                margin-left: 0;
+            }
+
+            .logo {
+                margin-bottom: 10px;
+            }
+
+            .voting-info {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-follower"></div>
+
+    <header class="nav container">
+        <a href="#" class="logo">Ishita Mandal</a>
+        <!-- New: Navigation Menu -->
+        <nav>
+            <ul class="nav-links">
+                <li class="nav-link"><a href="#manifesto">Manifesto</a></li>
+                <li class="nav-link"><a href="#pors">Experience</a></li>
+                <li class="nav-link"><a href="#game-section">Play a Game</a></li>
+                <li class="nav-link"><a href="#vote-info">Vote</a></li>
+            </ul>
+        </nav>
+        <!-- Theme tabs UI -->
+        <div class="theme-tabs">
+            <button class="theme-tab active" data-theme="default" aria-label="Default Theme"></button>
+            <button class="theme-tab" data-theme="sunset" aria-label="Sunset Theme"></button>
+            <button class="theme-tab" data-theme="ocean" aria-label="Ocean Theme"></button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero container">
+            <canvas id="hero-particles"></canvas>
+            <h1>Ishita Mandal: Your Voice, Your President.</h1>
+            <p>A new vision for IIPE. Together, we can build a vibrant, inclusive, and thriving campus community.</p>
+            <button id="cta-button" class="cta-button">Vote for Change</button>
+        </section>
+
+        <!-- Manifesto Section -->
+        <section id="manifesto" class="container">
+            <h2>Our Vision. Our Mission.</h2>
+            <p>Ishita Mandal is committed to being a voice for all students, ensuring their needs are heard and addressed.</p>
+            
+            <div class="manifesto-grid">
+                <div class="manifesto-card">
+                    <i class="ph-bold ph-users icon"></i>
+                    <h3>Student-Led Development</h3>
+                    <p>Launch a Common Gymkhana Portal, encourage in-house app development, and promote new technical clubs like Aeromodelling, Automotive, and Fintech.</p>
+                </div>
+                <div class="manifesto-card">
+                    <i class="ph-bold ph-hand-heart icon"></i>
+                    <h3>Student Support & Interaction</h3>
+                    <p>Introduce a "Student Buddy Program" for freshers, establish a "Socially Weaker Section" Cell, and conduct gender-based literacy programs.</p>
+                </div>
+                <div class="manifesto-card">
+                    <i class="ph-bold ph-first-aid-kit icon"></i>
+                    <h3>Campus Welfare</h3>
+                    <p>Set up an infirmary with necessary medical supplies, ensure equal hostel timings for all genders, and provide coffee machines and refreshments for PhD Scholars.</p>
+                </div>
+                <div class="manifesto-card">
+                    <i class="ph-bold ph-graduation-cap icon"></i>
+                    <h3>Academics & Personal Growth</h3>
+                    <p>Create a shared study bank, improve library facilities, and organize sessions on financial literacy, resume building, and LinkedIn networking.</p>
+                </div>
+                <div class="manifesto-card">
+                    <i class="ph-bold ph-chat-centered-dots icon"></i>
+                    <h3>Open Communication</h3>
+                    <p>Implement a Townhall concept for open discussions and bi-monthly grievance addressal meetings with the Gymkhana.</p>
+                </div>
+                <div class="manifesto-card">
+                    <i class="ph-bold ph-chart-line icon"></i>
+                    <h3>Transparent Governance</h3>
+                    <p>Promote accountability through regular open-house sessions.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- New: Meet Ishita/PORS Section -->
+        <section id="pors" class="container">
+            <h2>Meet Ishita</h2>
+            <p>A dedicated leader with a proven track record. Here are some of her key positions of responsibility (PORs) and leadership qualities.</p>
+            <div class="pors-grid">
+                <div class="por-card">
+                    <h3>Experience</h3>
+                    <ul>
+                        <li>Event-Management Head at LITCOM</li>
+                        <li>Membership Chairperson at IIChE SC</li>
+                        <li>AAPG Editorial Officer</li>
+                        <li>Core member of Institute Anchoring Team</li>
+                        <li>Coordinator (Sports & Games Committee)</li>
+                        <li>Organizing Member of Saswat fest 2023</li>
+                    </ul>
+                </div>
+                <div class="por-card">
+                    <h3>Leadership</h3>
+                    <ul>
+                        <li>Event Management for multiple events</li>
+                        <li>Public Speaking, Anchoring and Crowd Management</li>
+                        <li>Woman with a Vision for IIPE</li>
+                        <li>Encourage Innovative Excellence</li>
+                        <li>Want to be a People's President not a Ruling Leader</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Candidate Section -->
+        <section class="container candidate-bio">
+            <img src="ishita.jpeg" alt="A photo of Ishita Mandal" class="candidate-photo section-visible">
+            <h2>Ishita Mandal</h2>
+            <p>Standing for the post of President in the IIPE Gymkhana Election 2025. Her symbol is a microphone, symbolizing her commitment to amplifying your voice. She speaks, and we hear.</p>
+            <p>Recently placed at **Quantiphi**, she brings a drive for excellence and a professional perspective to her leadership.</p>
+        </section>
+
+        <!-- New: Game Section -->
+        <section id="game-section" class="container" style="position: relative;">
+            <h2>Play a quick game!</h2>
+            <p>Help Ishita catch all her P.O.R.s (Positions of Responsibility). Click the falling bubbles to score!</p>
+            <canvas id="game-canvas"></canvas>
+            <div id="gameOverMessage"></div>
+            <div class="game-controls">
+                <button id="startGameButton">Start Game</button>
+                <button id="speedUpButton">Speed Up Game</button>
+                <div class="score-timer-container">
+                    <div class="score">Score: <span id="scoreDisplay">0</span></div>
+                    <div class="timer">Time: <span id="timerDisplay">60</span>s</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Voting Info Section -->
+        <section id="vote-info" class="container voting-info">
+            <h2>Your Vote, Your Future.</h2>
+            <p>The future of our campus is in your hands. Vote with your heart and make a difference. The elections are on the 23rd of August, 2025.</p>
+        </section>
+    </main>
+
+    <footer class="footer container">
+        <p>&copy; 2025 Ishita Mandal Campaign. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // JavaScript for smooth animations, theme toggling, and the mini-game
+        document.addEventListener('DOMContentLoaded', () => {
+            // Function to handle scroll animations for sections and manifesto cards
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('section-visible');
+                        observer.unobserve(entry.target); // Stop observing after animation
+                    }
+                });
+            }, {
+                threshold: 0.1, // Trigger when 10% of the element is visible
+                rootMargin: "0px"
+            });
+
+            // Select all sections to observe
+            document.querySelectorAll('section').forEach(section => {
+                observer.observe(section);
+            });
+            
+            // Observer for the manifesto and PORS cards
+            const cardObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('card-visible');
+                        cardObserver.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.2
+            });
+
+            document.querySelectorAll('.manifesto-card, .por-card').forEach(card => {
+                cardObserver.observe(card);
+            });
+
+            // Confetti animation on CTA button click
+            const ctaButton = document.getElementById('cta-button');
+            ctaButton.addEventListener('click', () => {
+                confetti({
+                    particleCount: 150,
+                    spread: 120,
+                    origin: { y: 0.6 }
+                });
+            });
+
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Theme tab functionality
+            const themeTabsContainer = document.querySelector('.theme-tabs');
+            themeTabsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('theme-tab')) {
+                    // Remove 'active' class from all tabs
+                    document.querySelectorAll('.theme-tab').forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+                    
+                    // Add 'active' class to the clicked tab
+                    e.target.classList.add('active');
+                    
+                    // Get the new theme from the data attribute
+                    const newTheme = e.target.getAttribute('data-theme');
+                    
+                    // Remove all existing theme classes from the body
+                    document.body.classList.remove('sunset-theme', 'ocean-theme');
+                    
+                    // Add the new theme class
+                    if (newTheme !== 'default') {
+                        document.body.classList.add(`${newTheme}-theme`);
+                    }
+                }
+            });
+
+            // Cursor follower animation
+            const cursorFollower = document.querySelector('.cursor-follower');
+            document.addEventListener('mousemove', (e) => {
+                cursorFollower.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+            });
+
+            // Background particle animation
+            const heroParticles = document.getElementById('hero-particles');
+            const particleCtx = heroParticles.getContext('2d');
+            let particles = [];
+            const numParticles = 50;
+
+            // Set canvas size dynamically
+            function resizeCanvas() {
+                heroParticles.width = heroParticles.offsetWidth;
+                heroParticles.height = heroParticles.offsetHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            class Particle {
+                constructor(x, y, radius, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.radius = radius;
+                    this.color = color;
+                    this.velocity = {
+                        x: (Math.random() - 0.5) * 0.5,
+                        y: (Math.random() - 0.5) * 0.5
+                    };
+                }
+
+                draw() {
+                    particleCtx.beginPath();
+                    particleCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                    particleCtx.fillStyle = this.color;
+                    particleCtx.fill();
+                    particleCtx.closePath();
+                }
+
+                update() {
+                    this.draw();
+                    this.x += this.velocity.x;
+                    this.y += this.velocity.y;
+
+                    if (this.x + this.radius > heroParticles.width || this.x - this.radius < 0) {
+                        this.velocity.x = -this.velocity.x;
+                    }
+                    if (this.y + this.radius > heroParticles.height || this.y - this.radius < 0) {
+                        this.velocity.y = -this.velocity.y;
+                    }
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                for (let i = 0; i < numParticles; i++) {
+                    const radius = Math.random() * 2 + 1;
+                    const x = Math.random() * (heroParticles.width - radius * 2) + radius;
+                    const y = Math.random() * (heroParticles.height - radius * 2) + radius;
+                    const color = `rgba(142, 123, 255, ${Math.random() * 0.5 + 0.1})`;
+                    particles.push(new Particle(x, y, radius, color));
+                }
+            }
+
+            function animateParticles() {
+                requestAnimationFrame(animateParticles);
+                particleCtx.clearRect(0, 0, heroParticles.width, heroParticles.height);
+                particles.forEach(particle => {
+                    particle.update();
+                });
+            }
+            
+            initParticles();
+            animateParticles();
+
+            // --- Mini-Game Logic ---
+            const gameCanvas = document.getElementById('game-canvas');
+            const gameCtx = gameCanvas.getContext('2d');
+            const startGameButton = document.getElementById('startGameButton');
+            const speedUpButton = document.getElementById('speedUpButton');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const timerDisplay = document.getElementById('timerDisplay');
+            const gameOverMessage = document.getElementById('gameOverMessage');
+            
+            let gameBubbles = [];
+            let score = 0;
+            let gameInterval;
+            let gameTimer = 60;
+            let timerInterval;
+            let isGameOver = true;
+            let gameSpeed = 1;
+            let animationFrameId;
+
+            // Fix for responsive canvas size, called after variables are declared
+            function resizeGameCanvas() {
+                gameCanvas.width = gameCanvas.offsetWidth;
+                gameCanvas.height = gameCanvas.offsetHeight;
+                // Redraw bubbles after resize
+                drawGame();
+            }
+            resizeGameCanvas();
+            window.addEventListener('resize', resizeGameCanvas);
+
+            const porTitles = [
+                { text: "Event-Management Head", points: 10, type: 'por', color: 'rgba(142, 123, 255, 0.7)' },
+                { text: "Membership Chairperson", points: 10, type: 'por', color: 'rgba(142, 123, 255, 0.7)' },
+                { text: "AAPG Editorial Officer", points: 10, type: 'por', color: 'rgba(142, 123, 255, 0.7)' },
+                { text: "Core member", points: 10, type: 'por', color: 'rgba(142, 123, 255, 0.7)' },
+                { text: "Coordinator", points: 10, type: 'por', color: 'rgba(142, 123, 255, 0.7)' },
+                { text: "Organizing Member", points: 10, type: 'por', color: 'rgba(142, 123, 255, 0.7)' },
+                { text: "Distraction", points: -5, type: 'negative', color: 'rgba(255, 99, 71, 0.7)' },
+                { text: "Unnecessary Task", points: -5, type: 'negative', color: 'rgba(255, 99, 71, 0.7)' }
+            ];
+
+            function createBubble() {
+                const bubbleType = Math.random() > 0.8 ? 'negative' : 'por';
+                const filteredTitles = porTitles.filter(p => p.type === bubbleType);
+                const item = filteredTitles[Math.floor(Math.random() * filteredTitles.length)];
+
+                const radius = 40;
+                const x = Math.random() * (gameCanvas.width - radius * 2) + radius;
+                const y = -radius;
+                const speed = (Math.random() * 1.5 + 0.5) * gameSpeed;
+                
+                gameBubbles.push({ x, y, radius, speed, text: item.text, points: item.points, color: item.color });
+            }
+
+            function drawGame() {
+                gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+                gameBubbles.forEach(bubble => {
+                    gameCtx.beginPath();
+                    gameCtx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+                    gameCtx.fillStyle = bubble.color;
+                    gameCtx.fill();
+                    gameCtx.closePath();
+
+                    gameCtx.fillStyle = '#fff';
+                    gameCtx.textAlign = 'center';
+                    gameCtx.font = '12px Inter';
+                    gameCtx.fillText(bubble.text, bubble.x, bubble.y + 4);
+                });
+            }
+
+            function updateGame() {
+                if (isGameOver) return;
+                gameSpeed += 0.0005; // Gradually increase speed
+                for (let i = gameBubbles.length - 1; i >= 0; i--) {
+                    gameBubbles[i].y += gameBubbles[i].speed;
+                    // Remove bubbles that fall off the screen
+                    if (gameBubbles[i].y > gameCanvas.height + gameBubbles[i].radius) {
+                        gameBubbles.splice(i, 1);
+                    }
+                }
+                drawGame();
+                animationFrameId = requestAnimationFrame(updateGame);
+            }
+            
+            function updateTimer() {
+                gameTimer--;
+                timerDisplay.textContent = gameTimer;
+                if (gameTimer <= 0) {
+                    endGame();
+                }
+            }
+
+            function handleClick(event) {
+                if (isGameOver) return;
+                const rect = gameCanvas.getBoundingClientRect();
+                const clickX = event.clientX - rect.left;
+                const clickY = event.clientY - rect.top;
+
+                for (let i = gameBubbles.length - 1; i >= 0; i--) {
+                    const bubble = gameBubbles[i];
+                    const distance = Math.sqrt(
+                        Math.pow(clickX - bubble.x, 2) + Math.pow(clickY - bubble.y, 2)
+                    );
+
+                    if (distance < bubble.radius) {
+                        if (bubble.type === 'por') {
+                            confetti({
+                                particleCount: 50,
+                                spread: 60,
+                                origin: { x: clickX / gameCanvas.width, y: clickY / gameCanvas.height }
+                            });
+                        }
+                        
+                        gameBubbles.splice(i, 1);
+                        score += bubble.points;
+                        scoreDisplay.textContent = score;
+                    }
+                }
+            }
+            
+            function endGame() {
+                isGameOver = true;
+                clearInterval(gameInterval);
+                clearInterval(timerInterval);
+                cancelAnimationFrame(animationFrameId);
+                gameOverMessage.style.display = 'block';
+                gameOverMessage.innerHTML = `Game Over!<br>Your final score is ${score}`;
+                startGameButton.textContent = 'Play Again';
+            }
+
+            function startGame() {
+                isGameOver = false;
+                score = 0;
+                gameTimer = 60;
+                gameSpeed = 1;
+                gameBubbles = [];
+                scoreDisplay.textContent = score;
+                timerDisplay.textContent = gameTimer;
+                gameOverMessage.style.display = 'none';
+                
+                updateGame();
+                gameInterval = setInterval(createBubble, 1000);
+                timerInterval = setInterval(updateTimer, 1000);
+                startGameButton.textContent = 'Restart Game';
+            }
+
+            speedUpButton.addEventListener('click', () => {
+                if (!isGameOver) {
+                    gameSpeed += 0.5;
+                }
+            });
+
+            // Event listener for starting the game
+            startGameButton.addEventListener('click', startGame);
+            
+            // Event listener for clicking on the canvas
+            gameCanvas.addEventListener('click', handleClick);
+        });
+    </script>
+</body>
+</html>
